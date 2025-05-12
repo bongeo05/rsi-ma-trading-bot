@@ -17,6 +17,11 @@ rsi_period = 14
 ma_short = 50
 ma_long = 200
 
+# Functie pentru log (salvează în trading_log.txt)
+def log_message(message):
+    with open('trading_log.txt', 'a') as log_file:
+        log_file.write(f'{time.strftime("%Y-%m-%d %H:%M:%S")}: {message}\n')
+
 # Functie pentru a obține date de preț (close prices)
 def get_price_data():
     klines = client.get_klines(symbol=symbol, interval=interval, limit=ma_long)
@@ -42,14 +47,14 @@ def check_signals(df):
     ma50 = df['close'].rolling(window=ma_short).mean().iloc[-1]
     ma200 = df['close'].rolling(window=ma_long).mean().iloc[-1]
 
-    print(f'RSI: {rsi:.2f}, MA50: {ma50:.2f}, MA200: {ma200:.2f}')
+    log_message(f'RSI: {rsi:.2f}, MA50: {ma50:.2f}, MA200: {ma200:.2f}')
 
     if rsi < 30 and ma50 > ma200:
-        print('Semnal de CUMPARARE.')
+        log_message('Semnal de CUMPARARE.')
         # client.order_market_buy(symbol=symbol, quantity=quantity)
 
     elif rsi > 70 and ma50 < ma200:
-        print('Semnal de VANZARE.')
+        log_message('Semnal de VANZARE.')
         # client.order_market_sell(symbol=symbol, quantity=quantity)
 
 # Bucla principală
