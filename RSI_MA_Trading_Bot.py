@@ -1,8 +1,7 @@
 import os
 import time
 import pandas as pd
-from binance.client import Client
-from binance.enums import *
+from binance import Client
 
 # Conectare la Binance cu variabile de mediu
 api_key = os.getenv('BINANCE_API_KEY')
