@@ -10,8 +10,8 @@ WORKDIR /app
 COPY RSI_MA_Trading_Bot.py .
 COPY requirements.txt .
 
-# Instalăm librăriile direct cu versiunile compatibile
-RUN pip install --no-cache-dir numpy==1.21.6 pandas==1.3.5 binance-connector==2.0.0
+# Instalăm librăriile corecte
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Sistem de Log pentru Debug
 ENV PYTHONUNBUFFERED=1
