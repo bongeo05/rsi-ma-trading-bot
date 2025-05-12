@@ -18,8 +18,8 @@ rsi_period = 14
 ma_short = 50
 ma_long = 200
 simulated_trading = True  # Activare Simulated Trading
-usdc_balance = 1000.0  # Sold virtual inițial
-eth_balance = 0.0
+usdc_balance = 271,6  # Sold virtual inițial
+eth_balance = 0,25534421
 initial_usdc_balance = usdc_balance
 
 # Setări Telegram
