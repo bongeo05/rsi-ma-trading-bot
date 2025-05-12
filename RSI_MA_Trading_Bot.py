@@ -1,6 +1,7 @@
 import os
 import time
 import pandas as pd
+import requests
 from binance.client import Client
 from binance.enums import *
 
@@ -17,12 +18,37 @@ rsi_period = 14
 ma_short = 50
 ma_long = 200
 
+# Setări Telegram
+telegram_token = os.getenv('TELEGRAM_TOKEN')
+telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
+
+# Funcție pentru trimitere mesaje Telegram
+def send_telegram_message(message):
+    url = f'https://api.telegram.org/bot{telegram_token}/sendMessage'
+    payload = {'chat_id': telegram_chat_id, 'text': message}
+    try:
+        requests.post(url, data=payload)
+    except Exception as e:
+        log_error(f"Eroare Telegram: {str(e)}")
+
+# Funcție pentru procesare comenzi Telegram
+def process_telegram_command(command):
+    global rsi_period, ma_short, ma_long
+    if command.startswith('/set_rsi '):
+        try:
+            rsi_period = int(command.split(' ')[1])
+            send_telegram_message(f'✅ RSI setat la {rsi_period}.')
+        except:
+            send_telegram_message('❌ Eroare: Folosește /set_rsi [valoare].')
+
 # Funcție pentru loguri (salvează în trading_log.txt și error_log.txt)
 def log_message(message):
     print(message)
     with open('trading_log.txt', 'a') as log_file:
         log_file.write(f'{time.strftime("%Y-%m-%d %H:%M:%S")}: {message}\n')
+    send_telegram_message(message)
 
+# Funcție pentru log erori
 def log_error(message):
     print(f"EROARE: {message}")
     with open('error_log.txt', 'a') as error_file:
