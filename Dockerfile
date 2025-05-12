@@ -1,6 +1,4 @@
 # Dockerfile pentru RSI-MA Trading Bot
-
-# Folosim o imagine oficială Python
 FROM python:3.9-slim
 
 # Setăm directorul de lucru
