@@ -11,7 +11,7 @@ api_secret = os.getenv('BINANCE_API_SECRET')
 client = Client(api_key, api_secret)
 
 # Setări Bot
-symbol = 'ETHUSDC'
+symbol = 'ETHUSDC'  # Am schimbat la ETHUSDC pentru compatibilitate
 interval = '5m'  # Intervalul pentru datele RSI și MA
 quantity = 0.01  # Cât ETH să cumpere sau să vândă
 rsi_period = 14
@@ -30,16 +30,6 @@ def send_telegram_message(message):
         requests.post(url, data=payload)
     except Exception as e:
         log_error(f"Eroare Telegram: {str(e)}")
-
-# Funcție pentru procesare comenzi Telegram
-def process_telegram_command(command):
-    global rsi_period, ma_short, ma_long
-    if command.startswith('/set_rsi '):
-        try:
-            rsi_period = int(command.split(' ')[1])
-            send_telegram_message(f'✅ RSI setat la {rsi_period}.')
-        except:
-            send_telegram_message('❌ Eroare: Folosește /set_rsi [valoare].')
 
 # Funcție pentru loguri (salvează în trading_log.txt și error_log.txt)
 def log_message(message):
@@ -86,11 +76,19 @@ def check_signals(df):
 
         if rsi < 25 and ma50 > ma200:
             log_message('🚀 Semnal de CUMPARARE.')
-            client.order_market_buy(symbol=symbol, quantity=quantity)
+            try:
+                response = client.order_market_buy(symbol=symbol, quantity=quantity)
+                log_message(f'✅ Tranzacție de CUMPĂRARE executată: {response}')
+            except Exception as e:
+                log_error(f"EROARE LA CUMPĂRARE: {str(e)}")
 
         elif rsi > 75 and ma50 < ma200:
             log_message('⚠️ Semnal de VANZARE.')
-            client.order_market_sell(symbol=symbol, quantity=quantity)
+            try:
+                response = client.order_market_sell(symbol=symbol, quantity=quantity)
+                log_message(f'✅ Tranzacție de VÂNZARE executată: {response}')
+            except Exception as e:
+                log_error(f"EROARE LA VÂNZARE: {str(e)}")
 
     except Exception as e:
         log_error(f"EROARE LA SEMNAL: {str(e)}")
