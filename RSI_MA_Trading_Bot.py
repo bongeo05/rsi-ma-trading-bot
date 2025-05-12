@@ -11,7 +11,7 @@ api_secret = os.getenv('BINANCE_API_SECRET')
 client = Client(api_key, api_secret)
 
 # Setări Bot
-symbol = 'ETHUSDT'
+symbol = 'ETHUSDC'
 interval = '5m'  # Intervalul pentru datele RSI și MA
 quantity = 0.01  # Cât ETH să cumpere sau să vândă
 rsi_period = 14
