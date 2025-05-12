@@ -17,6 +17,10 @@ quantity = 0.01  # Cât ETH să cumpere sau să vândă
 rsi_period = 14
 ma_short = 50
 ma_long = 200
+simulated_trading = True  # Activare Simulated Trading
+usdc_balance = 1000.0  # Sold virtual inițial
+eth_balance = 0.0
+initial_usdc_balance = usdc_balance
 
 # Setări Telegram
 telegram_token = os.getenv('TELEGRAM_TOKEN')
@@ -67,6 +71,7 @@ def calculate_rsi(data):
 
 # Funcție pentru verificare semnal și execuție tranzacții
 def check_signals(df):
+    global usdc_balance, eth_balance
     try:
         rsi = calculate_rsi(df['close']).iloc[-1]
         ma50 = df['close'].rolling(window=ma_short).mean().iloc[-1]
@@ -74,32 +79,51 @@ def check_signals(df):
 
         log_message(f'RSI: {rsi:.2f}, MA50: {ma50:.2f}, MA200: {ma200:.2f}, Price: {df["close"].iloc[-1]:.2f}')
 
+        price = df['close'].iloc[-1]
+
         if rsi < 25 and ma50 > ma200:
             log_message('🚀 Semnal de CUMPARARE.')
-            try:
-                response = client.order_market_buy(symbol=symbol, quantity=quantity)
-                log_message(f'✅ Tranzacție de CUMPĂRARE executată: {response}')
-            except Exception as e:
-                log_error(f"EROARE LA CUMPĂRARE: {str(e)}")
+            if simulated_trading:
+                if usdc_balance >= price * quantity:
+                    usdc_balance -= price * quantity
+                    eth_balance += quantity
+                    log_message(f'Simulated BUY: +{quantity} ETH -{price * quantity} USDC')
+            else:
+                client.order_market_buy(symbol=symbol, quantity=quantity)
 
         elif rsi > 75 and ma50 < ma200:
             log_message('⚠️ Semnal de VANZARE.')
-            try:
-                response = client.order_market_sell(symbol=symbol, quantity=quantity)
-                log_message(f'✅ Tranzacție de VÂNZARE executată: {response}')
-            except Exception as e:
-                log_error(f"EROARE LA VÂNZARE: {str(e)}")
+            if simulated_trading:
+                if eth_balance >= quantity:
+                    eth_balance -= quantity
+                    usdc_balance += price * quantity
+                    log_message(f'Simulated SELL: -{quantity} ETH +{price * quantity} USDC')
+            else:
+                client.order_market_sell(symbol=symbol, quantity=quantity)
 
     except Exception as e:
         log_error(f"EROARE LA SEMNAL: {str(e)}")
 
+# Funcție pentru afișare raport final
+def final_report():
+    profit_usdc = usdc_balance - initial_usdc_balance
+    log_message("📊 RAPORT FINAL - Simulated Trading")
+    log_message(f"💰 Sold inițial: {initial_usdc_balance} USDC")
+    log_message(f"💰 Sold final: {usdc_balance} USDC")
+    log_message(f"💰 Profit/Pierdere: {profit_usdc} USDC")
+
 # Bucla principală
 def main():
-    log_message("🚀 Botul a pornit și monitorizează piața...")
-    while True:
-        df = get_price_data()
-        check_signals(df)
-        time.sleep(10)
+    log_message("🚀 Botul a pornit și monitorizează piața... (Simulated Trading: " + str(simulated_trading) + ")")
+    try:
+        while True:
+            df = get_price_data()
+            check_signals(df)
+            log_message(f'💰 USDC: {usdc_balance:.2f}, ETH: {eth_balance:.4f}')
+            time.sleep(10)
+    except KeyboardInterrupt:
+        final_report()
+        log_message("✅ Botul a fost oprit corect.")
 
 if __name__ == '__main__':
     main()
