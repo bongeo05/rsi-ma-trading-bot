@@ -37,7 +37,7 @@ def get_price_data():
         return df
     except Exception as e:
         log_error(f"EROARE API: {str(e)}")
-        time.sleep(60)
+        time.sleep(5)
         return get_price_data()
 
 # Funcție pentru calculul RSI
@@ -49,7 +49,7 @@ def calculate_rsi(data):
     rsi = 100 - (100 / (1 + rs))
     return rsi
 
-# Funcție pentru verificare semnal
+# Funcție pentru verificare semnal și execuție tranzacții
 def check_signals(df):
     try:
         rsi = calculate_rsi(df['close']).iloc[-1]
@@ -58,12 +58,13 @@ def check_signals(df):
 
         log_message(f'RSI: {rsi:.2f}, MA50: {ma50:.2f}, MA200: {ma200:.2f}, Price: {df["close"].iloc[-1]:.2f}')
 
-
         if rsi < 25 and ma50 > ma200:
             log_message('🚀 Semnal de CUMPARARE.')
+            client.order_market_buy(symbol=symbol, quantity=quantity)
 
         elif rsi > 75 and ma50 < ma200:
             log_message('⚠️ Semnal de VANZARE.')
+            client.order_market_sell(symbol=symbol, quantity=quantity)
 
     except Exception as e:
         log_error(f"EROARE LA SEMNAL: {str(e)}")
@@ -74,7 +75,7 @@ def main():
     while True:
         df = get_price_data()
         check_signals(df)
-        time.sleep(60)
+        time.sleep(10)
 
 if __name__ == '__main__':
     main()
