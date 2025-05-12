@@ -1,6 +1,6 @@
 # Dockerfile pentru RSI-MA Trading Bot
 
-# Folosim o imagine oficială Python
+# Folosim o imagine oficială Python 3.9 (versiune compatibilă)
 FROM python:3.9-slim
 
 # Setăm directorul de lucru
@@ -10,7 +10,7 @@ WORKDIR /app
 COPY RSI_MA_Trading_Bot.py .
 COPY requirements.txt .
 
-# Instalăm librăriile corecte
+# Instalăm librăriile corecte și stabile
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Sistem de Log pentru Debug
