@@ -1,2 +1,2 @@
-pandas
-binance-connector
+pandas==1.3.5
+binance-connector==2.0.0
