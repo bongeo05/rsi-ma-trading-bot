@@ -56,7 +56,8 @@ def check_signals(df):
         ma50 = df['close'].rolling(window=ma_short).mean().iloc[-1]
         ma200 = df['close'].rolling(window=ma_long).mean().iloc[-1]
 
-        log_message(f'RSI: {rsi:.2f}, MA50: {ma50:.2f}, MA200: {ma200:.2f}, Price: {df['close'].iloc[-1]:.2f}')
+        log_message(f'RSI: {rsi:.2f}, MA50: {ma50:.2f}, MA200: {ma200:.2f}, Price: {df["close"].iloc[-1]:.2f}')
+
 
         if rsi < 25 and ma50 > ma200:
             log_message('🚀 Semnal de CUMPARARE.')
