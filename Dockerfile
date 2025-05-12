@@ -6,16 +6,17 @@ FROM python:3.9-slim
 # Setăm directorul de lucru
 WORKDIR /app
 
-# Copiem fișierele necesare și instalăm doar pachetele necesare
+# Copiem fișierele necesare
 COPY requirements.txt .
+COPY RSI_MA_Trading_Bot.py .
+
+# Instalăm librăriile corecte și stabile
 RUN python -m pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-# Copiem scriptul după instalarea dependințelor (optimizare pentru cache)
-COPY RSI_MA_Trading_Bot.py .
-
-# Sistem de Log pentru Debug
+# Sistem de Log pentru Debug (loguri în timp real)
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONIOENCODING=utf-8
 
 # Setăm comanda de start
 CMD ["python", "RSI_MA_Trading_Bot.py"]
